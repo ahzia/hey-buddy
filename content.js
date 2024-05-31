@@ -3,28 +3,17 @@ function createChatInterface(username, chatname) {
   // Create chat container
   const chatContainer = document.createElement("div");
   chatContainer.id = "hey-buddy-chat";
-  chatContainer.style.position = "fixed";
-  chatContainer.style.bottom = "0";
-  chatContainer.style.right = "0";
-  chatContainer.style.width = "300px";
-  chatContainer.style.height = "400px";
-  chatContainer.style.border = "1px solid #ccc";
-  chatContainer.style.borderRadius = "5px 5px 0 0";
-  chatContainer.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
-  chatContainer.style.backgroundColor = "#fff";
-  chatContainer.style.zIndex = "9999";
-  chatContainer.style.display = "flex";
-  chatContainer.style.flexDirection = "column";
 
   // Create header for the chat with minimize button
   const chatHeader = document.createElement("div");
-  chatHeader.style.backgroundColor = "#007bff";
-  chatHeader.style.color = "#fff";
-  chatHeader.style.padding = "10px";
-  chatHeader.style.display = "flex";
-  chatHeader.style.justifyContent = "space-between";
-  chatHeader.style.alignItems = "center";
-  chatHeader.style.borderRadius = "5px 5px 0 0";
+  chatHeader.classList.add("chat-header");
+  // chatHeader.style.backgroundColor = "#007bff";
+  // chatHeader.style.color = "#fff";
+  // chatHeader.style.padding = "10px";
+  // chatHeader.style.display = "flex";
+  // chatHeader.style.justifyContent = "space-between";
+  // chatHeader.style.alignItems = "center";
+  // chatHeader.style.borderRadius = "5px 5px 0 0";
   chatHeader.innerHTML = `<span>${chatname}</span>`;
   const minimizeButton = document.createElement("button");
   minimizeButton.innerText = "-";
