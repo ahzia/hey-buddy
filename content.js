@@ -1,5 +1,5 @@
 // Function to inject the Dialogflow Messenger script and CSS
-function injectDialogflowMessenger(settings){
+function injectDialogflowMessenger(settings) {
   // Inject CSS
   const link = document.createElement("link");
   link.href = chrome.runtime.getURL("dialogflow/df-messenger-default.css");
@@ -20,40 +20,43 @@ function injectDialogflowMessenger(settings){
 
 // Function to initialize the Dialogflow Messenger with website content
 function initializeDialogflowMessenger(settings) {
-    const sessionId = sessionStorage.getItem('df-messenger-sessionID');
-    const userDataSent = sessionStorage.getItem('df-messenger-userdataSent');
-    console.log('Session ID:', sessionId);
-    console.log('User Data Sent:', userDataSent);
-    if (!userDataSent) {
-      const pageTitle = document.title;
-      //TODO: Change Here
-      const text = `{userName: "${settings.username}", agentName: "${settings.chatname}",userAge: "15", agentPersona: "Frindly", titleOfTopic: "${pageTitle}"`;
-      fetch(`https://dialogflow.cloud.google.com/v1/cx/integrations/messenger/webhook/projects/hey-buddy-425118/agents/565449f1-c5bd-40c2-8457-295ce6ae892d/sessions/${sessionId}`, {
-        method: 'POST',
+  const sessionId = sessionStorage.getItem("df-messenger-sessionID");
+  const userDataSent = sessionStorage.getItem("df-messenger-userdataSent");
+  console.log("Session ID:", sessionId);
+  console.log("User Data Sent:", userDataSent);
+  if (!userDataSent) {
+    const pageTitle = document.title;
+    //TODO: Change Here
+    const text = `{userName: "${settings.username}", agentName: "${settings.chatname}", userAge: "${settings.age}, agentPersona: "Frindly", titleOfTopic: "${pageTitle}"`;
+    fetch(
+      `https://dialogflow.cloud.google.com/v1/cx/integrations/messenger/webhook/projects/hey-buddy-425118/agents/565449f1-c5bd-40c2-8457-295ce6ae892d/sessions/${sessionId}`,
+      {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           queryInput: {
             text: {
               text: text,
             },
-            languageCode: 'en',
+            languageCode: "en",
           },
           queryParams: {
-            channel: 'DF_MESSENGER',
+            channel: "DF_MESSENGER",
           },
         }),
+      }
+    )
+      .then((data) => {
+        console.log("Success:", data);
+        // set the session storage
+        sessionStorage.setItem("df-messenger-userdataSent", "true");
       })
-        .then((data) => {
-          console.log('Success:', data);
-          // set the session storage
-          sessionStorage.setItem('df-messenger-userdataSent', 'true');
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
-    };
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
 }
 
 // Function to create the chat bubble and settings icon
@@ -101,9 +104,10 @@ function createChatAndSettings(settings) {
 }
 
 // Load and inject the chat bubble and settings icon
-chrome.storage.sync.get(["username", "chatname"], (result) => {
+chrome.storage.sync.get(["username", "chatname", "age"], (result) => {
   const username = result.username || "You";
   const chatname = result.chatname || "Hey Buddy";
-  const settings = { username, chatname };
+  const age = result.age || "18";
+  const settings = { username, chatname, age };
   createChatAndSettings(settings);
 });
