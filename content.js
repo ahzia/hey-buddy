@@ -1,122 +1,109 @@
-// Function to create the chat interface
-function createChatInterface(username, chatname) {
+// Function to inject the Dialogflow Messenger script and CSS
+function injectDialogflowMessenger(settings){
+  // Inject CSS
+  const link = document.createElement("link");
+  link.href = chrome.runtime.getURL("dialogflow/df-messenger-default.css");
+  link.rel = "stylesheet";
+  document.head.appendChild(link);
+
+  // Inject JS
+  const script = document.createElement("script");
+  script.src = chrome.runtime.getURL("dialogflow/df-messenger.js");
+  script.async = true;
+  document.head.appendChild(script);
+
+  script.onload = () => {
+    console.log("loaded");
+    initializeDialogflowMessenger(settings);
+  };
+}
+
+// Function to initialize the Dialogflow Messenger with website content
+function initializeDialogflowMessenger(settings) {
+    const sessionId = sessionStorage.getItem('df-messenger-sessionID');
+    const userDataSent = sessionStorage.getItem('df-messenger-userdataSent');
+    console.log('Session ID:', sessionId);
+    console.log('User Data Sent:', userDataSent);
+    if (!userDataSent) {
+      const pageTitle = document.title;
+      //TODO: Change Here
+      const text = `{userName: "${settings.username}", agentName: "${settings.chatname}",userAge: "15", agentPersona: "Frindly", titleOfTopic: "${pageTitle}"`;
+      fetch(`https://dialogflow.cloud.google.com/v1/cx/integrations/messenger/webhook/projects/hey-buddy-425118/agents/565449f1-c5bd-40c2-8457-295ce6ae892d/sessions/${sessionId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          queryInput: {
+            text: {
+              text: text,
+            },
+            languageCode: 'en',
+          },
+          queryParams: {
+            channel: 'DF_MESSENGER',
+          },
+        }),
+      })
+        .then((data) => {
+          console.log('Success:', data);
+          // set the session storage
+          sessionStorage.setItem('df-messenger-userdataSent', 'true');
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    };
+}
+
+// Function to create the chat bubble and settings icon
+function createChatAndSettings(settings) {
+  injectDialogflowMessenger(settings);
+  const chatname = settings.chatname;
   // Create chat container
   const chatContainer = document.createElement("div");
   chatContainer.id = "hey-buddy-chat";
   chatContainer.style.position = "fixed";
-  chatContainer.style.bottom = "0";
-  chatContainer.style.right = "0";
-  chatContainer.style.width = "300px";
-  chatContainer.style.height = "400px";
-  chatContainer.style.border = "1px solid #ccc";
-  chatContainer.style.borderRadius = "5px 5px 0 0";
-  chatContainer.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
-  chatContainer.style.backgroundColor = "#fff";
+  chatContainer.style.bottom = "16px";
+  chatContainer.style.right = "16px";
   chatContainer.style.zIndex = "9999";
-  chatContainer.style.display = "flex";
-  chatContainer.style.flexDirection = "column";
 
-  // Create header for the chat with minimize button
-  const chatHeader = document.createElement("div");
-  chatHeader.style.backgroundColor = "#007bff";
-  chatHeader.style.color = "#fff";
-  chatHeader.style.padding = "10px";
-  chatHeader.style.display = "flex";
-  chatHeader.style.justifyContent = "space-between";
-  chatHeader.style.alignItems = "center";
-  chatHeader.style.borderRadius = "5px 5px 0 0";
-  chatHeader.innerHTML = `<span>${chatname}</span>`;
-  const minimizeButton = document.createElement("button");
-  minimizeButton.innerText = "-";
-  minimizeButton.style.background = "none";
-  minimizeButton.style.border = "none";
-  minimizeButton.style.color = "#fff";
-  minimizeButton.style.fontSize = "20px";
-  minimizeButton.style.cursor = "pointer";
-  chatHeader.appendChild(minimizeButton);
-  chatContainer.appendChild(chatHeader);
+  // Create chat bubble
+  const chatBubble = document.createElement("df-messenger");
+  chatBubble.setAttribute("project-id", "hey-buddy-425118");
+  chatBubble.setAttribute("agent-id", "565449f1-c5bd-40c2-8457-295ce6ae892d");
+  chatBubble.setAttribute("language-code", "en");
+  chatBubble.setAttribute("max-query-length", "-1");
 
-  // Create chat messages container
-  const chatBox = document.createElement("div");
-  chatBox.id = "chat-box";
-  chatBox.style.flex = "1";
-  chatBox.style.padding = "10px";
-  chatBox.style.overflowY = "scroll";
-  chatContainer.appendChild(chatBox);
+  const chatBubbleSettings = document.createElement("df-messenger-chat-bubble");
+  chatBubbleSettings.setAttribute("chat-title", `${chatname}👋`);
+  chatBubble.appendChild(chatBubbleSettings);
 
-  // Create input field and send button
-  const chatInputContainer = document.createElement("div");
-  chatInputContainer.style.display = "flex";
-  chatInputContainer.style.padding = "10px";
-  chatInputContainer.style.borderTop = "1px solid #ccc";
-  const inputField = document.createElement("input");
-  inputField.type = "text";
-  inputField.id = "input-field";
-  inputField.placeholder = "Type a message...";
-  inputField.style.flex = "1";
-  inputField.style.padding = "5px";
-  const sendButton = document.createElement("button");
-  sendButton.id = "send-button";
-  sendButton.innerText = "Send";
-  sendButton.style.padding = "5px";
-  chatInputContainer.appendChild(inputField);
-  chatInputContainer.appendChild(sendButton);
-  chatContainer.appendChild(chatInputContainer);
+  chatContainer.appendChild(chatBubble);
+
+  // Create settings icon
+  const settingsIcon = document.createElement("div");
+  settingsIcon.id = "settings-icon";
+  settingsIcon.style.position = "fixed";
+  settingsIcon.style.bottom = "16px";
+  settingsIcon.style.right = "80px";
+  settingsIcon.style.zIndex = "9999";
+  settingsIcon.style.cursor = "pointer";
+  settingsIcon.innerHTML = `<i class="fas fa-cog" style="font-size: 24px;"></i>`;
+
+  // Click event to open settings
+  settingsIcon.addEventListener("click", () => {
+    chrome.runtime.openOptionsPage();
+  });
 
   document.body.appendChild(chatContainer);
-
-  // Minimize button functionality
-  minimizeButton.addEventListener("click", () => {
-    if (chatBox.style.display === "none") {
-      chatBox.style.display = "block";
-      chatInputContainer.style.display = "flex";
-      minimizeButton.innerText = "-";
-      chatContainer.style.height = "400px";
-    } else {
-      chatBox.style.display = "none";
-      chatInputContainer.style.display = "none";
-      minimizeButton.innerText = "+";
-      chatContainer.style.height = "40px";
-    }
-  });
-
-  // Send button functionality
-  sendButton.addEventListener("click", () => {
-    const message = inputField.value;
-    if (message.trim() === "") return;
-
-    // Display user's message in chat box
-    const userMessage = document.createElement("div");
-    userMessage.innerHTML = `<strong>${username}:</strong> ${message}`;
-    chatBox.appendChild(userMessage);
-    inputField.value = "";
-    chatBox.scrollTop = chatBox.scrollHeight; // Auto scroll to bottom
-
-    // Send message and page content to backend
-    chrome.runtime.sendMessage({ action: "getContent" }, (response) => {
-      fetch("https://your-backend-function-url", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, content: response.content }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          // Display bot's response in chat box
-          const botMessage = document.createElement("div");
-          botMessage.innerHTML = `<strong>${chatname}:</strong> ${data.reply}`;
-          chatBox.appendChild(botMessage);
-          chatBox.scrollTop = chatBox.scrollHeight; // Auto scroll to bottom
-        })
-        .catch((err) => {
-          console.error("Error:", err);
-        });
-    });
-  });
+  document.body.appendChild(settingsIcon);
 }
 
-// Load stored settings and create the chat interface
+// Load and inject the chat bubble and settings icon
 chrome.storage.sync.get(["username", "chatname"], (result) => {
   const username = result.username || "You";
   const chatname = result.chatname || "Hey Buddy";
-  createChatInterface(username, chatname);
+  const settings = { username, chatname };
+  createChatAndSettings(settings);
 });
