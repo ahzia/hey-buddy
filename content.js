@@ -114,7 +114,7 @@ function createChatAndSettings(settings) {
 }
 
 // Load and inject the chat bubble and settings icon
-chrome.storage.sync.get(['username', 'chatname', 'age'], (result) => {
+chrome.storage.sync.get(['username', 'chatname', 'age', 'agentPersona'], (result) => {
   const username = result.username || 'You';
   const chatname = result.chatname || 'Hey Buddy';
   const age = result.age || '18';
