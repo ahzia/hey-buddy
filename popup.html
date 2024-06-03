@@ -15,19 +15,26 @@
     <h1>Settings</h1>
     <form id="settings-form">
       <div class="form-group">
-        <label for="personality"><i class="fas fa-user-friends"></i> Agent Personality:</label>
-        <div class="personality-options">
-          <input type="checkbox" id="friendly" name="personality" value="friendly">
-          <label for="friendly">Friendly</label>
-          <input type="checkbox" id="professional" name="personality" value="professional">
-          <label for="professional">Professional</label>
-        </div>
+        <label for="username"><i class="fas fa-user"></i> Your Name:</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div class="form-group">
+        <label for="chatname"><i class="fas fa-comments"></i> Chat Name:</label>
+        <input type="text" id="chatname" name="chatname" required>
       </div>
       <div class="form-group">
         <label for="age"><i class="fas fa-birthday-cake"></i> Age:</label>
         <input type="number" id="age" name="age" required>
       </div>
-
+      <div class="form-group">
+        <label for="personality"><i class="fas fa-user-tag"></i> Personality:</label>
+        <div class="personality-switch">
+          <input type="radio" id="friendly" name="personality" value="friendly" checked>
+          <label for="friendly" class="personality-option"><i class="fas fa-smile"></i> Friendly</label>
+          <input type="radio" id="professional" name="personality" value="professional">
+          <label for="professional" class="personality-option"><i class="fas fa-briefcase"></i> Professional</label>
+        </div>
+      </div>
       <button type="submit"><i class="fas fa-save"></i> Save</button>
     </form>
   </div>
