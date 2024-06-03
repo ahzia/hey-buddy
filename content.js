@@ -38,18 +38,18 @@ const sendMessageToAgent = (message, type) => {
           channel: 'DF_MESSENGER',
         },
       }),
-    }
+    },
   )
     .then((data) => {
       console.log('Success:', data);
-      if(type === 'settings') {
+      if (type === 'settings') {
         sessionStorage.setItem('df-messenger-userdataSent', 'true');
       }
     })
     .catch((error) => {
       console.error('Error:', error);
     });
-}
+};
 
 // Function to initialize the Dialogflow Messenger with website content
 function initializeDialogflowMessenger(settings) {
@@ -62,7 +62,7 @@ function initializeDialogflowMessenger(settings) {
     const pageTitle = document.title;
     const websiteContent = `websiteContent: '${document.body.innerText}'`;
     console.log('pageTitle', pageTitle);
-    console.log('websiteContent', websiteContent)
+    console.log('websiteContent', websiteContent);
     const text = `{userName: '${settings.username}', agentName: '${settings.chatname}', userAge: '${settings.age}, agentPersona: ${settings.agentPersona}, titleOfTopic: '${pageTitle}'`;
     sendMessageToAgent(websiteContent, 'websiteContent');
     sendMessageToAgent(text, 'settings');
@@ -119,6 +119,8 @@ chrome.storage.sync.get(['username', 'chatname', 'age'], (result) => {
   const chatname = result.chatname || 'Hey Buddy';
   const age = result.age || '18';
   const agentPersona = result.agentPersona || 'Friendly';
-  const settings = { username, chatname, age, agentPersona };
+  const settings = {
+    username, chatname, age, agentPersona
+  };
   createChatAndSettings(settings);
 });

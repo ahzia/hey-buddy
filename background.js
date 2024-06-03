@@ -2,7 +2,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'settings',
     title: 'Open Settings',
-    contexts: ['action']
+    contexts: ['action'],
   });
 
   chrome.contextMenus.onClicked.addListener((info) => {
