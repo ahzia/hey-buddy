@@ -1,0 +1,15 @@
+#hey-buddy-chat {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 9999;
+}
+
+#settings-icon {
+  position: fixed;
+  bottom: 16px;
+  right: 80px;
+  z-index: 9999;
+  cursor: pointer;
+  font-size: 24px;
+}
