@@ -3,9 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const usernameInput = document.getElementById('username');
   const chatnameInput = document.getElementById('chatname');
   const ageInput = document.getElementById('age');
+  const personalityInputs = document.getElementsByName('personality');
 
   // Load stored settings
-  chrome.storage.sync.get(['username', 'chatname', 'age'], (result) => {
+  chrome.storage.sync.get(['username', 'chatname', 'age', 'agentPersona'], (result) => {
     if (result.username) {
       usernameInput.value = result.username;
     }
@@ -15,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (result.age) {
       ageInput.value = result.age;
     }
+    if (result.agentPersona) {
+      document.getElementById(result.agentPersona).checked = true;
+    }
   });
 
   // Save settings on form submit
@@ -23,7 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const username = usernameInput.value;
     const chatname = chatnameInput.value;
     const age = ageInput.value;
-    chrome.storage.sync.set({ username, chatname, age }, () => {
+    const agentPersona = document.querySelector('input[name="personality"]:checked').value;
+    chrome.storage.sync.set({ username, chatname, age, agentPersona }, () => {
       alert('Settings saved');
     });
   });
