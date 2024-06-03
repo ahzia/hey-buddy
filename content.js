@@ -120,7 +120,7 @@ chrome.storage.sync.get(['username', 'chatname', 'age'], (result) => {
   const age = result.age || '18';
   const agentPersona = result.agentPersona || 'Friendly';
   const settings = {
-    username, chatname, age, agentPersona
+    username, chatname, age, agentPersona,
   };
   createChatAndSettings(settings);
 });
