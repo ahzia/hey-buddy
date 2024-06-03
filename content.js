@@ -18,44 +18,54 @@ function injectDialogflowMessenger(settings) {
   };
 }
 
+const sendMessageToAgent = (message, type) => {
+  const sessionId = sessionStorage.getItem("df-messenger-sessionID");
+  fetch(
+    `https://dialogflow.cloud.google.com/v1/cx/integrations/messenger/webhook/projects/hey-buddy-425118/agents/565449f1-c5bd-40c2-8457-295ce6ae892d/sessions/${sessionId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        queryInput: {
+          text: {
+            text: message,
+          },
+          languageCode: "en",
+        },
+        queryParams: {
+          channel: "DF_MESSENGER",
+        },
+      }),
+    }
+  )
+    .then((data) => {
+      console.log("Success:", data);
+      if(type === "settings") {
+        sessionStorage.setItem("df-messenger-userdataSent", "true");
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
 // Function to initialize the Dialogflow Messenger with website content
 function initializeDialogflowMessenger(settings) {
   const sessionId = sessionStorage.getItem("df-messenger-sessionID");
   const userDataSent = sessionStorage.getItem("df-messenger-userdataSent");
   console.log("Session ID:", sessionId);
   console.log("User Data Sent:", userDataSent);
+  
   if (!userDataSent) {
     const pageTitle = document.title;
-    //TODO: Change Here
-    const text = `{userName: "${settings.username}", agentName: "${settings.chatname}", userAge: "${settings.age}, agentPersona: "Frindly", titleOfTopic: "${pageTitle}"`;
-    fetch(
-      `https://dialogflow.cloud.google.com/v1/cx/integrations/messenger/webhook/projects/hey-buddy-425118/agents/565449f1-c5bd-40c2-8457-295ce6ae892d/sessions/${sessionId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          queryInput: {
-            text: {
-              text: text,
-            },
-            languageCode: "en",
-          },
-          queryParams: {
-            channel: "DF_MESSENGER",
-          },
-        }),
-      }
-    )
-      .then((data) => {
-        console.log("Success:", data);
-        // set the session storage
-        sessionStorage.setItem("df-messenger-userdataSent", "true");
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    const websiteContent = `websiteContent: '${document.body.innerText}'`;
+    console.log('pageTitle', pageTitle);
+    console.log('websiteContent', websiteContent)
+    const text = `{userName: "${settings.username}", agentName: "${settings.chatname}", userAge: "${settings.age}, agentPersona: ${settings.agentPersona}, titleOfTopic: "${pageTitle}"`;
+    sendMessageToAgent(websiteContent, "websiteContent");
+    sendMessageToAgent(text, "settings");
   }
 }
 
@@ -108,6 +118,7 @@ chrome.storage.sync.get(["username", "chatname", "age"], (result) => {
   const username = result.username || "You";
   const chatname = result.chatname || "Hey Buddy";
   const age = result.age || "18";
-  const settings = { username, chatname, age };
+  const agentPersona = result.agentPersona || "Friendly";
+  const settings = { username, chatname, age, agentPersona };
   createChatAndSettings(settings);
 });
