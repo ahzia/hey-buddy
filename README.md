@@ -19,8 +19,6 @@ Hey Buddy is an intelligent extension that aims to be your learning partner. Whe
 - **Friendly**: Casual, includes emojis and jokes to make learning fun.
 - **Professional**: Formal and precise, perfect for a serious learning environment.
 
-Sure, here is the corrected `README.md` starting from the Installation section:
-
 ## Installation 🛠️
 
 To get started with Hey Buddy, follow these simple steps:

@@ -13,7 +13,6 @@ function injectDialogflowMessenger(settings) {
   document.head.appendChild(script);
 
   script.onload = () => {
-    console.log('loaded');
     initializeDialogflowMessenger(settings);
   };
 }
@@ -41,7 +40,6 @@ const sendMessageToAgent = (message, type) => {
     },
   )
     .then((data) => {
-      console.log('Success:', data);
       if (type === 'settings') {
         sessionStorage.setItem('df-messenger-userdataSent', 'true');
       }
@@ -55,14 +53,10 @@ const sendMessageToAgent = (message, type) => {
 function initializeDialogflowMessenger(settings) {
   const sessionId = sessionStorage.getItem('df-messenger-sessionID');
   const userDataSent = sessionStorage.getItem('df-messenger-userdataSent');
-  console.log('Session ID:', sessionId);
-  console.log('User Data Sent:', userDataSent);
   
   if (!userDataSent) {
     const pageTitle = document.title;
     const websiteContent = `websiteContent: '${document.body.innerText}'`;
-    console.log('pageTitle', pageTitle);
-    console.log('websiteContent', websiteContent);
     const text = `{userName: '${settings.username}', agentName: '${settings.chatname}', userAge: '${settings.age}, agentPersona: ${settings.agentPersona}, titleOfTopic: '${pageTitle}'`;
     sendMessageToAgent(websiteContent, 'websiteContent');
     sendMessageToAgent(text, 'settings');
